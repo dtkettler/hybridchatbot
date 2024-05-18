@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "rma": {
+      "description": "True if the user indicates they want to do an RMA, false otherwise",
+      "type": "boolean"
+    },
+    "order_status": {
+      "description": "True if the user indicates they want to check order status, false otherwise",
+      "type": "boolean"
+    },
+    "has_order_number": {
+      "description": "True if the user indicates that they have their order number, false otherwise",
+      "type": "boolean"
+    },
+    "order_number": {
+      "description": "The order number provided by the user",
+      "type": "string"
+    }
+  }
+}
