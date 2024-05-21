@@ -1,6 +1,10 @@
 {
   "type": "object",
   "properties": {
+    "do_not_understand": {
+      "description": "True if you do not understand the user's most recent response or if it doesn't fit into the other categories",
+      "type": "boolean"
+    },
     "rma": {
       "description": "True if the user indicates they want to do an RMA, false otherwise",
       "type": "boolean"
