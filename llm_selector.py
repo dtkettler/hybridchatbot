@@ -2,7 +2,6 @@ import configparser
 from abc import ABC, abstractmethod
 
 from gpt import GPT
-#from llamacpp import Llamacpp
 #from mlcllm import MLCLLM
 
 
@@ -22,12 +21,13 @@ def get_llm():
     type = config['DEFAULT']['model_type']
 
     if type == "llamacpp":
-        model = config['DEFAULT']['model']
-        n_gpu_layers = config.getint('DEFAULT', 'n_gpu_layers')
-        n_batch = config.getint('DEFAULT', 'n_batch')
+        from llamacpp import Llamacpp
+        model_repo = config['DEFAULT']['model_repo']
+        model_file = config['DEFAULT']['model_file']
+        gpu_layers = config.getint('DEFAULT', 'gpu_layers')
         template_format = config['DEFAULT']['template_format']
 
-        #return Llamacpp(model, n_gpu_layers, n_batch, template_format)
+        return Llamacpp(model_repo, model_file, template_format, gpu_layers)
     elif type == "mlc":
         model = config['DEFAULT']['model']
         device = config['DEFAULT']['device']

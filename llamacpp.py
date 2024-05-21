@@ -1,35 +1,15 @@
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.prompts import PromptTemplate
-from langchain_community.llms import LlamaCpp
-from llama_cpp import LlamaGrammar, Llama
-import time
-import json
 import logging
+import json
+import outlines
 from animated_loader import AnimatedLoader
 
 
 logging.basicConfig(filename='error.log', encoding='utf-8', level=logging.DEBUG)
 
 class Llamacpp:
-    def __init__(self, model_path, n_gpu_layers, n_batch, template_format):
-
-        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-
-        with open("lib/json.gbnf") as f:
-            self.grammar = LlamaGrammar.from_string(f.read())
-
-        self.llm = Llama(
-                model_path=model_path,
-                n_gpu_layers=n_gpu_layers,
-                n_batch=n_batch,
-                f16_kv=True,
-                max_tokens=5000,
-                top_p=1,
-                n_ctx=32000,
-                verbose=True,
-                callback_manager=callback_manager
-            )
+    def __init__(self, model_repo, model_file, template_format, gpu_layers):
+        self.model = outlines.models.llamacpp(model_repo, model_file, n_gpu_layers=gpu_layers)
+        self.model = outlines.models.llamacpp(model_repo, model_file)
 
         if template_format == "chatML":
             self.prompt_template = """<|im_start|>system
@@ -40,9 +20,22 @@ class Llamacpp:
 <|im_start|>assistant
 """
             self.history_element = """<|im_start|>user
-{}<|im_end|>
+{user}<|im_end|>
 <|im_start|>assistant
-{}<|im_end|>"""
+{assist}<|im_end|>"""
+        elif template_format == "phi":
+            self.prompt_template = """<|system|>
+{system_prompt}<|end|>
+{history}
+<|user|>
+{user_prompt}
+<|assistant|>
+"""
+            self.history_element = """<|user|>
+{user}<|end|>
+<|assistant|>
+{assist}<|end|>
+"""
         else:
             self.prompt_template = """<s>[INST] <<SYS>>
 {system_prompt}
@@ -52,29 +45,32 @@ class Llamacpp:
 """
             self.history_element = """{user} [/INST] {assist} </s><s>[INST] """
 
-    def run_model(self, prompt, temperature=0.5, json=False):
+    def run_model(self, prompt, temperature=0.5, Json=False, functions=None):
         with AnimatedLoader():
-            if json:
-                result = self.llm(prompt, temperature=temperature, max_tokens=5000, grammar=self.grammar)
+            if functions:
+                generator = outlines.generate.json(self.model, json.dumps(functions[0]["parameters"]))
+                output = generator(prompt)
+            elif Json:
+                # JSON without schema not implemented yet in this verison...
+                pass
             else:
-                result = self.llm(prompt, temperature=temperature, max_tokens=5000)
+                generator = outlines.generate.text(self.model)
+                output = generator(prompt)
 
-            self.llm.reset()
 
-        return result['choices'][0]['text']
+        return output
 
-    def run_llm(self, system_prompt, user_prompt, temperature=0.5, json=False):
+    def run_llm(self, system_prompt, user_prompt, temperature=0.5, Json=False):
         prompt = self.prompt_template.format(system_prompt=system_prompt, history="", user_prompt=user_prompt)
 
-        return self.run_model(prompt, temperature, json)
+        return self.run_model(prompt, temperature, Json=Json)
 
-    def run_llm_with_history(self, system_prompt, user_prompt, history, temperature=0.5, json=False):
-
+    def run_llm_with_history(self, system_prompt, user_prompt, history, temperature=0.5, functions=None):
         history_prompt = ""
         for message in history:
             history_prompt += self.history_element.format(user=message["user"], assist=message["assistant"])
 
-        prompt = self.prompt_template.format(system_prompt=system_prompt, history=history_prompt, user_prompt=user_prompt)
+        prompt = self.prompt_template.format(system_prompt=system_prompt, history=history_prompt,
+                                             user_prompt=user_prompt)
 
-        return self.run_model(prompt, temperature, json)
-
+        return self.run_model(prompt, temperature, functions=functions)
