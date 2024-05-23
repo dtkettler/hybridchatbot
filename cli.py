@@ -18,8 +18,11 @@ def run(runner, schema, messages):
         user_prompt = input("> ")
         messages.add_user(user_prompt.strip())
 
-        output = llm_control.run_llm_with_history("You are interpreting the user's commands and outputing the appropriate JSON object",
-                                                  user_prompt, messages.get_formatted(), temperature=0.2, functions=[function])
+        output = llm_control.run_llm_with_history("""You are interpreting the user's commands and outputing the appropriate JSON object.
+Do not include any information the user has not provided and if they correct or change a response use their latest response.
+""",
+                                                  user_prompt, messages.get_formatted(), temperature=0.2, schema=schema)
+                                                  #functions=[function])
         logging.debug(output)
 
         runner.run(output)
