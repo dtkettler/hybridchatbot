@@ -2,4 +2,3 @@ durable_rules
 huggingface-hub
 langchain
 openai
-outlines

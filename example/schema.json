@@ -14,7 +14,7 @@
       "type": "boolean"
     },
     "has_order_number": {
-      "description": "True if the user indicates that they have their order number, false otherwise",
+      "description": "True if the user indicates that they have their order number, false if they say they don't, don't answer otherwise",
       "type": "boolean"
     },
     "order_number": {

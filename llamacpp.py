@@ -82,7 +82,12 @@ class Llamacpp:
 
         return self.run_model(messages, temperature, Json=Json)
 
-    def run_llm_with_history(self, system_prompt, user_prompt, history, temperature=0.5, schema=None):
+    def run_llm_with_history(self, system_prompt, user_prompt, history, temperature=0.5, functions=None):
+        if functions:
+            schema = functions[0]["parameters"]
+        else:
+            schema = None
+
         if schema:
             system_prompt += "\nJSON output should use the schema:\n{}".format(schema)
 
