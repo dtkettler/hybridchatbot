@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "do_not_understand": {
+      "description": "True if you do not understand the user's most recent response or if it doesn't fit into the other categories",
+      "type": "boolean"
+    },
+    "rma": {
+      "description": "True if the user indicates they want to do an RMA, false otherwise",
+      "type": "boolean"
+    },
+    "order_status": {
+      "description": "True if the user indicates they want to check order status, false otherwise",
+      "type": "boolean"
+    },
+    "has_order_number": {
+      "description": "True if the user indicates that they have their order number, false if they say they don't, don't answer otherwise",
+      "type": "boolean"
+    },
+    "order_number": {
+      "description": "The order number provided by the user",
+      "type": "string"
+    }
+  }
+}

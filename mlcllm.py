@@ -19,12 +19,16 @@ class MLCLLM:
                                                                 response_format={"type": "json_object",
                                                                                  "schema": json.dumps(schema)},
                                                                 stream=False)
-                output = json.loads(responses.choices[0].message.content)["properties"]
+                output = json.loads(responses.choices[0].message.content)
+                if "properties" in output:
+                    output = output["properties"]
             elif Json:
                 responses = self.engine.chat.completions.create(messages=messages, model=self.model,
                                                                 temperature=temperature,
                                                                 response_format={"type": "json_object"}, stream=False)
-                output = json.loads(responses.choices[0].message.content)["properties"]
+                output = json.loads(responses.choices[0].message.content)
+                if "properties" in output:
+                    output = output["properties"]
             else:
                 responses = self.engine.chat.completions.create(messages=messages, model=self.model,
                                                                 temperature=temperature,

@@ -1,5 +1,5 @@
 import openai
-import configparser
+import os
 import time
 import json
 import logging
@@ -11,10 +11,7 @@ logging.basicConfig(filename='error.log', encoding='utf-8', level=logging.DEBUG)
 
 class GPT:
     def __init__(self, model):
-        config = configparser.ConfigParser()
-        config.read('keys.ini')
-
-        api_key = config['DEFAULT']['openai_key']
+        api_key = os.environ["OPENAI_KEY"]
         self.model = model
         self.client = openai.OpenAI(api_key=api_key)
 
